@@ -65,7 +65,17 @@ class GroupController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'sometimes|required|string|max:255',
+            'description' => 'nullable|string',
+            'type' => 'sometimes|required|string|in:hospital,clinician_group',
+            'parent_id' => 'nullable|exists:groups,id',
+        ]);
+
+        $group = Group::findOrFail($id);
+        $group->update($validated);
+        
+        return response()->json($group);
     }
 
     /**
