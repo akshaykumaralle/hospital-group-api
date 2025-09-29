@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Group;
 use Illuminate\Http\Request;
 
 class GroupController extends Controller
@@ -11,7 +12,9 @@ class GroupController extends Controller
      */
     public function index()
     {
-        //
+        $groups = Group::with('children')->whereNull('parent_id')->get();
+        
+        return response()->json($groups);
     }
 
     /**
@@ -27,7 +30,16 @@ class GroupController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'type' => 'required|string|in:hospital,clinician_group',
+            'parent_id' => 'nullable|exists:groups,id',
+        ]);
+
+        $group = Group::create($validated);
+
+        return response()->json($group, 201);
     }
 
     /**
