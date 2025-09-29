@@ -13,7 +13,7 @@ class GroupController extends Controller
     public function index()
     {
         $groups = Group::with('children')->whereNull('parent_id')->get();
-        
+
         return response()->json($groups);
     }
 
@@ -47,7 +47,9 @@ class GroupController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $group = Group::with('children')->findOrFail($id);
+        
+        return response()->json($group);
     }
 
     /**
