@@ -73,6 +73,9 @@ class GroupController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $group = Group::findOrFail($id);
+        $group->delete();
+        
+        return response()->json(['message' => 'Group deleted successfully']);
     }
 }
