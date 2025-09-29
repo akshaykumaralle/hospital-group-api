@@ -19,4 +19,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::apiResource('groups', GroupController::class);
+Route::apiResource('groups', GroupController::class)->except(['create', 'edit']);
