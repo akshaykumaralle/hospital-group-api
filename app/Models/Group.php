@@ -26,7 +26,7 @@ class Group extends Model
      */
     public function children()
     {
-        return $this->hasMany(Group::class, 'parent_id');
+        return $this->hasMany(Group::class, 'parent_id')->with('children');
     }
 
     /**
