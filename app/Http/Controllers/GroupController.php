@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Group;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class GroupController extends Controller
 {
@@ -23,7 +24,14 @@ class GroupController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('groups')->where(function ($query) use ($request) {
+                    return $query->where('parent_id', $request->input('parent_id'));
+                }),
+            ],
             'description' => 'nullable|string',
             'type' => 'required|string|in:hospital,clinician_group',
             'parent_id' => 'nullable|exists:groups,id',
@@ -49,14 +57,24 @@ class GroupController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $group = Group::findOrFail($id);
+        $parentId = $request->input('parent_id', $group->parent_id);
+        
         $validated = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
+            'name' => [
+                'sometimes',
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('groups')->where(function ($query) use ($parentId) {
+                    return $query->where('parent_id', $parentId);
+                })->ignore($id),
+            ],
             'description' => 'nullable|string',
             'type' => 'sometimes|required|string|in:hospital,clinician_group',
             'parent_id' => 'nullable|exists:groups,id',
         ]);
 
-        $group = Group::findOrFail($id);
         $group->update($validated);
 
         return response()->json($group);
