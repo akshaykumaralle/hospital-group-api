@@ -49,9 +49,7 @@ class GroupController extends Controller
     {
         $group = Group::with('children')->find($id);
         if (!$group) {
-            return response()->json([
-                'error' => 'Group not found.'
-            ], 404);
+            return response()->json(['error' => 'Group not found.'], 404);
         }
 
         return response()->json($group);
@@ -63,11 +61,11 @@ class GroupController extends Controller
     public function update(Request $request, string $id)
     {
         $group = Group::find($id);
+
         if (!$group) {
-            return response()->json([
-                'error' => 'Group not found.'
-            ], 404);
+            return response()->json(['error' => 'Group not found.'], 404);
         }
+
         $parentId = $request->input('parent_id', $group->parent_id);
 
         $validated = $request->validate([
@@ -88,9 +86,7 @@ class GroupController extends Controller
         // Prevent circular reference: group cannot be its own parent or ancestor
         if (!empty($validated['parent_id'])) {
             if ($validated['parent_id'] == $group->id) {
-                return response()->json([
-                    'error' => 'A group cannot be its own parent.'
-                ], 422);
+                return response()->json(['error' => 'A group cannot be its own parent.'], 422);
             }
 
             $parent = Group::find($validated['parent_id']);
@@ -98,9 +94,7 @@ class GroupController extends Controller
                 $ancestor = $parent;
                 while ($ancestor) {
                     if ($ancestor->id == $group->id) {
-                        return response()->json([
-                            'error' => 'A group cannot be its own ancestor.'
-                        ], 422);
+                        return response()->json(['error' => 'A group cannot be its own ancestor.'], 422);
                     }
                     $ancestor = $ancestor->parent;
                 }
@@ -120,15 +114,11 @@ class GroupController extends Controller
         $group = Group::find($id);
 
         if (!$group) {
-            return response()->json([
-                'error' => 'Group not found.'
-            ], 404);
+            return response()->json(['error' => 'Group not found.'], 404);
         }
 
         if ($group->children()->count() > 0) {
-            return response()->json([
-                'error' => 'Cannot delete group with children.'
-            ], 422);
+            return response()->json(['error' => 'Cannot delete group with children.'], 422);
         }
         
         $group->delete();
