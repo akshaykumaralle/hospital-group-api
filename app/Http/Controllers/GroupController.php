@@ -59,7 +59,7 @@ class GroupController extends Controller
     {
         $group = Group::findOrFail($id);
         $parentId = $request->input('parent_id', $group->parent_id);
-        
+
         $validated = $request->validate([
             'name' => [
                 'sometimes',
@@ -74,6 +74,28 @@ class GroupController extends Controller
             'type' => 'sometimes|required|string|in:hospital,clinician_group',
             'parent_id' => 'nullable|exists:groups,id',
         ]);
+
+        // Prevent circular reference: group cannot be its own parent or ancestor
+        if (!empty($validated['parent_id'])) {
+            if ($validated['parent_id'] == $group->id) {
+                return response()->json([
+                    'error' => 'A group cannot be its own parent.'
+                ], 422);
+            }
+
+            $parent = Group::find($validated['parent_id']);
+            if ($parent) {
+                $ancestor = $parent;
+                while ($ancestor) {
+                    if ($ancestor->id == $group->id) {
+                        return response()->json([
+                            'error' => 'A group cannot be its own ancestor.'
+                        ], 422);
+                    }
+                    $ancestor = $ancestor->parent;
+                }
+            }
+        }
 
         $group->update($validated);
 
