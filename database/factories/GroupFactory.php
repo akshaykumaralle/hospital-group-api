@@ -14,6 +14,7 @@ class GroupFactory extends Factory
         return [
             'name' => $this->faker->company . ' Clinician Group',
             'description' => $this->faker->sentence,
+            'type' => $this->faker->randomElement(['clinician_group', 'clinician_group', 'clinician_group', 'hospital']),
             'parent_id' => null, // Default to no parent
         ];
     }
