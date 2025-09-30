@@ -118,13 +118,21 @@ class GroupController extends Controller
     public function destroy(string $id)
     {
         $group = Group::find($id);
+
         if (!$group) {
             return response()->json([
                 'error' => 'Group not found.'
             ], 404);
         }
-        $group->delete();
+
+        if ($group->children()->count() > 0) {
+            return response()->json([
+                'error' => 'Cannot delete group with children.'
+            ], 422);
+        }
         
+        $group->delete();
+
         return response()->json(['message' => 'Group deleted successfully']);
     }
 }
