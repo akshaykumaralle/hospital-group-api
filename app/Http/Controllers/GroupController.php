@@ -47,8 +47,13 @@ class GroupController extends Controller
      */
     public function show(string $id)
     {
-        $group = Group::with('children')->findOrFail($id);
-        
+        $group = Group::with('children')->find($id);
+        if (!$group) {
+            return response()->json([
+                'error' => 'Group not found.'
+            ], 404);
+        }
+
         return response()->json($group);
     }
 
@@ -57,7 +62,12 @@ class GroupController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $group = Group::findOrFail($id);
+        $group = Group::find($id);
+        if (!$group) {
+            return response()->json([
+                'error' => 'Group not found.'
+            ], 404);
+        }
         $parentId = $request->input('parent_id', $group->parent_id);
 
         $validated = $request->validate([
@@ -107,7 +117,12 @@ class GroupController extends Controller
      */
     public function destroy(string $id)
     {
-        $group = Group::findOrFail($id);
+        $group = Group::find($id);
+        if (!$group) {
+            return response()->json([
+                'error' => 'Group not found.'
+            ], 404);
+        }
         $group->delete();
         
         return response()->json(['message' => 'Group deleted successfully']);
