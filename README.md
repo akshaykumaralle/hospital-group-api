@@ -18,7 +18,6 @@ The API enforces strict data integrity rules, preventing circular references and
 
 * **Tree Retrieval:** The `GET /api/groups` endpoint returns the full organization structure, rooted at the top-level hospitals.
 
-* **Custom Exception Handling:** Catches critical system failures (`QueryException`, `PDOException`) and returns standardized, non-revealing JSON error messages.
 
 ## 🛠️ Installation and Setup
 
